@@ -87,6 +87,7 @@ double SimpleMemory::process() {
 			outputs.push_back(new Message((void*)(new ThReqParams(Done, NULL, 0)), this->id, sender));
 		}
 		delete r;
+		delete m;
 		inputs.pop_front();
 		return energyPerCycle; //if op, add energy
 	}

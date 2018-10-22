@@ -1,4 +1,4 @@
-//TODO EVERYWHERE: ensure created objects are eventually delete'd ("delete <objname>;")!
+//FIXME Warning: EVERYWHERE: ensure created objects are eventually delete'd ("delete <objname>;")!
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -96,10 +96,12 @@ int step() {
 						//TODO
 						break;
 				}
+				delete trp;
 				
 				//result = data;
 			}
 			
+			delete msg;
 			(m->outputs).pop_front();
 		}
 	}

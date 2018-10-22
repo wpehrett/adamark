@@ -1,34 +1,34 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <cstring>
-#include <iostream>
 #include <list>
-#include <vector>
-#include <algorithm>
 
 #ifndef PROTOTYPES_HPP
 #define PROTOTYPES_HPP
-#endif
 
-using namespace std;
-
-//TODO: if possible: make all the various void*'s into some sort of disposable C++ object that can be garbage-collected
+//Start = signal ready to start simulation
+//Done = signal to stop and check results
+//GetData = request some amount of data be sent to the requesting module's input
+//PutData = response to GetData request, or (unrequested) final output data to record for later checking. If sent by system with null data, this means all data from the input dataset has been ingested by the simulated system.
+enum ThReqType {Start, Done, GetData, PutData};
+class ThReqParams {
+	public:
+		ThReqType type;
+		void* data; //note: must be freed (if applicable) by the message recipient to prevent memory leaks
+		unsigned int datasize; //size in bytes; type assumed per testcase definition
+		
+		ThReqParams(ThReqType type, void* data, unsigned int datasize);
+		~ThReqParams();
+};
 
 class Message {
 	public:
-		void* data;
+		void* data; //note: must be freed (if applicable) by the message recipient to prevent memory leaks
 		int src; //use -1 for system
 		int dest; //use -1 for system
 		//TODO later: add data size parameter (esp for power estimation) - maybe just as semi-optional metadata?
 		//TODO later: add something to indicate data type? (Probably need to leave this purely user-defined, though)
 		
-		//TODO make proper constructor/destructors
-		Message(void* data, int src, int dest) { //Yes, this is bad style to define it here in a header file, but w/e
-			this->data = data;
-			this->src = src;
-			this->dest = dest;
-		}
-		~Message() {}
+		Message(void* data, int src, int dest);
+		~Message();
 };
 
 class Module {
@@ -38,15 +38,13 @@ class Module {
 		unsigned int cycleCount; //which cycle this module is on, bounded by [0, latency)
 		unsigned int maxPipeline; //if this module is pipelined, how much can be in-flight at once (will likely == latency)
 		bool stalled; //if waiting for data, set flag so this module won't advance until ready
-		double cumulativeEnergy = 0.0; //updated by simulator loop; TODO break this out to at module-level to enable greater modeling detail (e.g. variable energy based on intra-module activity, lower value for cycles while stalled, etc.)
+		double cumulativeEnergy; //updated by simulator loop based on return value from process()
 		
 		/* TODO refine/revise: different signals going to/from different modules, ready and not-ready signals (and inputs of those signals from up/downstream modules), etc.. Probably: eliminate these altogether from the top-level Module class and make the programmer define them per their specific design... except that the top-level needs to know for the simulation cycle what gets passed where... */
-		list<Message*> inputs;
-		list<Message*> outputs;
+		std::list<Message*> inputs;
+		std::list<Message*> outputs;
 		
-		virtual double process() = 0; //Returns energy expended in that simulation step, in nJ (TODO decide if that's an appropriate order of magnitude!)
-		
-		//TODO make prooper constructor/destructors
-		Module() {}
-		~Module() {}
+		virtual double process() = 0; //Returns energy expended in that simulation step, in nJ (TODO decide if that's an appropriate order of magnitude!); result may be zero (if not trying to model power), static (for simplicity), or variable (for greater accuracy) based on intra-module activity, lower value for cycles while stalled, etc.
 };
+
+#endif

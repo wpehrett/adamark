@@ -11,6 +11,10 @@
 #define SIZE 2048
 #define TYPE int32_t
 #define TYPE_MAX INT32_MAX
+/*#define TYPE int64_t
+#define TYPE_MAX INT64_MAX*/
+/*#define TYPE double
+#define TYPE_MAX DOUBLE_MAX*/
 
 #ifndef MSMERGESORT_HPP
 #define MSMERGESORT_HPP

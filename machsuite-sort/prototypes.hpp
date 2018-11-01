@@ -45,7 +45,7 @@ class Module {
 		std::list<Message*> inputs;
 		std::list<Message*> outputs;
 		
-		virtual void init(void* data, unsigned int datasize) = 0; //Called iff the module is defined as init in the system configuration file. 
+		virtual void init(void* data, unsigned int datasize) = 0; //Called iff the module is defined as init in the system configuration file. Data size is given in bytes. TODO consider changing this to directly supply the vector and only the vector!
 		
 		virtual double process() = 0; //Returns energy expended in that simulation step, in nJ (TODO decide if that's an appropriate order of magnitude!); result may be zero (if not trying to model power), static (for simplicity), or variable (for greater accuracy) based on intra-module activity, lower value for cycles while stalled, etc.
 };

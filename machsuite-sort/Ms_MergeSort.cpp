@@ -72,7 +72,6 @@ Ms_MergeSort::Ms_MergeSort(unsigned int id) {
 	cycleCount = 0;
 	maxPipeline = 1;
 	stalled = false;
-	//energyPerCycle = 0.0;
 	cumulativeEnergy = 0.0;
 	running = false;
 }
@@ -80,8 +79,8 @@ Ms_MergeSort::~Ms_MergeSort() {}
 
 void Ms_MergeSort::init(void* data, unsigned int size) {
 	if (data != NULL) {
-		//We assume, for this testcase, that the data are an array of [size] int32_t's
-		for (int i=0; i<size; i++) {
+		//We assume, for this testcase, that the data are an array of [size/sizeof(int32_t)] int32_t's
+		for (int i=0; i<(size/sizeof(TYPE)); i++) {
 			this->data[i] = ((TYPE*)data)[i];
 		}
 	}
@@ -98,21 +97,14 @@ double Ms_MergeSort::process() {
 				dataOut[i] = this->data[i];
 			}
 			outputs.push_back(new Message((void*)(new ThReqParams(Done, dataOut, SIZE)), this->id, -1));
-			//return energyPerCycle;
-			return 0.0;
+			return 0.0; //FIXME change to energy value, if applicable
 		}
 		else { //Not done, increment cycle count
 			cycleCount++;
-			//return energyPerCycle;
-			return 0.0;
+			return 0.0; //FIXME change to energy value, if applicable
 		}
 	}
 	else if (inputs.size() > 0) {
-		printf("Ms_MergeSort input size: %lu\n", inputs.size());
-		printf("Ms_MergeSort output size: %lu\n", outputs.size());
-		
-		//outputs.push_back(new Message((void*)(new ThReqParams(Done, NULL, 0)), this->id, sender));
-		
 		//Note: expected input data format is a pointer to a ThReqParams object
 		Message* m = inputs.front();
 		ThReqParams* r = (ThReqParams*)(m->data);
@@ -124,14 +116,14 @@ double Ms_MergeSort::process() {
 			running = true;
 		}
 		else { //Unknown op, ignore
-			//outputs.push_back(new Message((void*)data, this->id, sender));
-			//outputs.push_back(new Message((void*)(new ThReqParams(Done, NULL, 0)), this->id, sender));
 		}
+		
+		//Clean up message data objects that were malloc'd or created with C++ "new"
 		delete r;
 		delete m;
 		inputs.pop_front();
-		//return energyPerCycle; //if op, add energy
-		return 0.0;
+		
+		return 0.0; //FIXME change to energy value, if applicable
 	}
 	return 0.0; //if no op, we're treating it as 0-energy for now
 }

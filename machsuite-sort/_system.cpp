@@ -1,3 +1,4 @@
+/******** DYNAMICALLY GENERATED FILE, DO NOT MODIFY ********/
 #include <stdlib.h>
 #include <vector>
 #include <algorithm>
@@ -13,8 +14,8 @@ SysCfg::SysCfg() {
 /******** DYNAMICALLY GENERATED PER SYSCFG FILE, DO NOT MODIFY ********/
 	Ss_Sort* m0 = new Ss_Sort(0);
 	modules.push_back(m0);
-	mod_init = m0;
-	mod_start_id = 0;
+	mod_init_ids.push_back(0);
+	mod_start_ids.push_back(0);
 /**********************************************************************/
 }
 
@@ -35,3 +36,4 @@ int SysCfg::cleanList() {
 	
 	return 0;
 }
+/***********************************************************/

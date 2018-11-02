@@ -73,7 +73,7 @@ with open(args.syscfg, 'r') as f:
 		params = []
 		init = False
 		start = False
-		for i in range(2,len(tokens)):
+		for i in range(2,len(tokens)): #TODO FIXME make this better-defined, and less potentially-confusing in structure, and also make sure to note in the docs that "init" and "start" cannot appear in the C++ params!
 			if tokens[i] == 'init': init = True
 			elif tokens[i] == 'start': start = True
 			else: params.append(tokens[i])

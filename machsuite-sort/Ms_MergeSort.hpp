@@ -21,9 +21,9 @@
 
 using namespace std;
 
-class Ms_MergeSort: public Module { //One port, arbitrary data, single-cycle latency, infinite i/o queue sizes
+class Ms_MergeSort: public Module {
 	public:
-		TYPE data[SIZE]; //Memory structure itself
+		TYPE data[SIZE];
 		
 		bool running;
 		

@@ -218,7 +218,7 @@ int main(int argc, char* argv[]) {
 		printf("Error: output differs from expected!\n");
 	}
 	else printf("Output comparison successful!\n");
-	free(data_result);
+	//free(data_result); //We don't care if this leaks since we're ending the program anyway, and a module designer may send us a pointer to a stack-allocated something that we *can't* free
 	
 	//Cleanup: compute final metrics, display results, exit
 	printf("Simulation complete, cleaning up...\n");

@@ -46,7 +46,7 @@ Module:
 The Module class, like the Message class, is designed to be as generic as possible to provide a foundation for both arbitrary hardware definitions and more-specific class prototypes for common purposes (see below). The key elements, as noted previously, are the module ID (used for passing messages), the input and output queues of Messages, the init() function (used to initialize internal data structures with testcase-specific input data from the testbench, if necessary), and the process() function (called at each simulation step for each module).
 
 FixedLatencyModule:
-<Coming soon!>
+This class is designed to simplify implementation of modules that operate on a lump of data with a fixed latency (no pipelining and no variable/nondeterministic latency). Key parameters are latency (# cycles) and idleEnergy/activeEnergy, all of which must be set by the constructor of a child class. FixedLatencyModule directly implements the virtual process() function of its Module parent. This function checks for Messages from other modules, and, if one is found, it saves the Message and then passes it on to a child-defined virtual function, process_real(), after <latency> cycles. process_real() is required to immediately handle the Message and add any necessary Messages to the module's output queue.
 
 --------FINAL NOTES--------
 

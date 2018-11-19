@@ -37,10 +37,10 @@ class Module { //TODO make some extended abstract classes for PipelinedModule, F
 	public:
 		//TODO FIXME review: are all these actually needed for every Module?
 		unsigned int id; //global module identifier, used for message passing and addressing
-		unsigned int latency; //number of cycles to traverse this module
-		unsigned int cycleCount; //which cycle this module is on, bounded by [0, latency)
-		unsigned int maxPipeline; //if this module is pipelined, how much can be in-flight at once (will likely == latency)
-		bool stalled; //if waiting for data, set flag so this module won't advance until ready
+		//unsigned int latency; //number of cycles to traverse this module
+		//unsigned int cycleCount; //which cycle this module is on, bounded by [0, latency)
+		//unsigned int maxPipeline; //if this module is pipelined, how much can be in-flight at once (will likely == latency)
+		//bool stalled; //if waiting for data, set flag so this module won't advance until ready
 		double cumulativeEnergy; //updated by simulator loop based on return value from process()
 		
 		/* TODO refine/revise: different signals going to/from different modules, ready and not-ready signals (and inputs of those signals from up/downstream modules), etc.. Probably: eliminate these altogether from the top-level Module class and make the programmer define them per their specific design... except that the top-level needs to know for the simulation cycle what gets passed where... */
@@ -50,6 +50,33 @@ class Module { //TODO make some extended abstract classes for PipelinedModule, F
 		virtual void init(void* data, unsigned int datasize) = 0; //Called iff the module is defined as init in the system configuration file. Data size is given in bytes. TODO consider changing this to directly supply the vector and only the vector, without a separate datasize parameter required! Also, TODO explicitly note in the readme, instructions, whatever that, if the former change is made, "data" MUST NOT BE MODIFIED BY THE FUNCTION! (we could guarantee this programmatically by restructuring a bit of main.cpp, but idk if it's worth it...)
 		
 		virtual double process() = 0; //Returns energy expended in that simulation step, in nJ (TODO decide if that's an appropriate order of magnitude!); result may be zero (if not trying to model power), static (for simplicity), or variable (for greater accuracy) based on intra-module activity, lower value for cycles while stalled, etc.
+};
+
+class FixedLatencyModule: public Module {
+	public: //TODO revise/revine access permissions for these (public/private/protected) - all these can *probably* be protected
+		unsigned int latency;
+		unsigned int cycleCount;
+		
+		Message* msg_tmp;
+		
+		double idleEnergy;
+		double activeEnergy;
+		
+		bool running;
+		bool stalled;
+		
+		double process();
+		
+		virtual void process_real(Message* m) = 0;
+};
+
+class BasicPipelinedModule: public Module {
+	public:
+		unsigned int pipelineDepth;
+		bool stalled;
+		
+		virtual void process_real() = 0;
+		//TODO something about pipe_data? init? how to keep processing messages... probably as pipe_data? need to think through this paradigm more thoroughly.
 };
 
 #endif

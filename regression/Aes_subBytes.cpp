@@ -28,7 +28,7 @@ Aes_subBytes::Aes_subBytes(unsigned int id) {
 	//latency = 15; //not actually cycles here, we're co-opting it to keep track of how many encryption rounds we're doing
 	//cycleCount = 0;
 	//maxPipeline = 1;
-	stalled = false;
+	//stalled = false;
 	cumulativeEnergy = 0.0;
 	//running = false;
 	/*

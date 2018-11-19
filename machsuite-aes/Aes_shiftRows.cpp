@@ -61,7 +61,7 @@ double Aes_shiftRows::process() {
 		
 		inputs.pop_front();
 		
-		return 0.0; //FIXME change to energy value, if applicable
+		return 0.65; //FIXME change to energy value, if applicable
 	}
-	return 0.0; //if no op, we're treating it as 0-energy for now
+	return 0.1; //if no op, we're treating it as 0-energy for now
 }

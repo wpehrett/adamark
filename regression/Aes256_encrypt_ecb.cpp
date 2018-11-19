@@ -73,18 +73,11 @@ void aes_expandEncKey(uint8_t *k, uint8_t *rc)
 
 } /* aes_expandEncKey */
 
+//Constructor/destructor
 Aes256_encrypt_ecb::Aes256_encrypt_ecb(unsigned int id) {
 	this->id = id;
-	//latency = 15; //not actually cycles here, we're co-opting it to keep track of how many encryption rounds we're doing
-	//cycleCount = 0;
-	//maxPipeline = 1;
-	//stalled = false;
 	cumulativeEnergy = 0.0;
 	running = false;
-	/*
-		aes256_context ctx;
-		uint8_t buf[16];
-	*/
 }
 Aes256_encrypt_ecb::~Aes256_encrypt_ecb() {}
 
@@ -119,7 +112,7 @@ double Aes256_encrypt_ecb::process() {
 				outputs.push_back(new Message((void*)(new ThReqParams(Done, (void*)result_arr, 16)), this->id, -1));
 				delete m;
 				running = false;
-				return 3.0; //FIXME actual power
+				return 3.0;
 			}
 			//If we get here, we're not done, so keep running...
 			aes_mixColumns(this->buf);
@@ -132,10 +125,10 @@ double Aes256_encrypt_ecb::process() {
 			m->dest = 1; //statically defined subBytes module ID
 			outputs.push_back(m);
 			i++;
-			return 2.0; //FIXME actual power
+			return 2.0;
 		}
 		else { //Round not yet complete; keep waiting
-			return 0.25; //Treat as idle for now; FIXME add some sort of power number here
+			return 0.25; //Treat as idle for now
 		}
 	}
 	else if (inputs.size() > 0) {
@@ -145,7 +138,6 @@ double Aes256_encrypt_ecb::process() {
 		unsigned int sender = m->src;
 		
 		if (r->type == Start) { //Start processing data currently in storage
-			//cycleCount = 1;
 			running = true;
 			aes_addRoundKey_cpy(buf, (&ctx)->enckey, (&ctx)->key);
 			i = 1;
@@ -162,7 +154,7 @@ double Aes256_encrypt_ecb::process() {
 		delete m;
 		inputs.pop_front();
 		
-		return 2.0; //FIXME change to energy value, if applicable
+		return 2.0;
 	}
-	return 0.25; //if no op, we're treating it as 0-energy for now
+	return 0.25;
 }

@@ -26,19 +26,10 @@ void aes_shiftRows(uint8_t *buf)
 
 } /* aes_shiftRows */
 
-//Ms_MergeSort constructor/destructor
+//Constructor/destructor
 Aes_shiftRows::Aes_shiftRows(unsigned int id) {
 	this->id = id;
-	//latency = 15; //not actually cycles here, we're co-opting it to keep track of how many encryption rounds we're doing
-	//cycleCount = 0;
-	//maxPipeline = 1;
-	//stalled = false;
 	cumulativeEnergy = 0.0;
-	//running = false;
-	/*
-		aes256_context ctx;
-		uint8_t buf[16];
-	*/
 }
 Aes_shiftRows::~Aes_shiftRows() {}
 
@@ -49,7 +40,6 @@ double Aes_shiftRows::process() {
 		//Note: expected input data format is a pointer to a Message with predetermined data size and format
 		Message* m = inputs.front();
 		uint8_t* arr = (uint8_t*)(m->data);
-		//unsigned int sender = m->src;
 		
 		aes_shiftRows(arr);
 		
@@ -61,7 +51,7 @@ double Aes_shiftRows::process() {
 		
 		inputs.pop_front();
 		
-		return 0.65; //FIXME change to energy value, if applicable
+		return 0.65;
 	}
-	return 0.1; //if no op, we're treating it as 0-energy for now
+	return 0.1;
 }

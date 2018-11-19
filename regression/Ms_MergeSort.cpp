@@ -65,7 +65,7 @@ void ms_mergesort(TYPE a[SIZE]) {
     }
 }
 
-//Ms_MergeSort constructor/destructor
+//Constructor/destructor
 Ms_MergeSort::Ms_MergeSort(unsigned int id) {
 	this->id = id;
 	latency = SIZE*ceil(log2(SIZE));
@@ -86,7 +86,6 @@ void Ms_MergeSort::init(void* data, unsigned int size) {
 void Ms_MergeSort::process_real(Message* m) {
 	ThReqParams* r = (ThReqParams*)(m->data);
 	unsigned int sender = m->src;
-	//printf("Calling procreal...\n");
 	
 	if (r->type == Start) { //Start processing data currently in storage
 		ms_mergesort(this->data);

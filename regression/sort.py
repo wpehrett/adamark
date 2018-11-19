@@ -1,15 +1,25 @@
 # Sort testcase:
-# Input data: unsorted list of ints
-# Output data: sorted list of ints
+# Input data: unsorted list of 2048 int32_t's
+# Output data: sorted list of 2048 int32_t's
 
-tc_name = 'sort' # Used as the output program name for the final C++ build
-data_in = 'sort-input.data' # Input data file; must be a newline-separated list of values of data_in_type with no extraneous lines or information of any sort in the file
-data_in_type = 'int32_t' # Modify this per the specific testcase; must be one of [int32_t, int64_t, double] (TODO add string or char[] support)
-data_out = 'sort-check.data' # Output data file; must be a newline-separated list of values of data_in_type with no extraneous lines or information of any sort in the file
-data_out_type = 'int32_t' # Modify this per the specific testcase; must be one of [int32_t, int64_t, double] (TODO add string or char[] support)
 
-# TODO define a comparison function - e.g., for mlperf, a function to check an outputted trained-model for performance within spec <see also below:::>
-#TODO permit a user-defined parse-output function that converts whatever the final module dumps out into a format we can compare  programmatically (using a testcase-defined function) against the reference output file (and, this could include (for instance) a function that checks the quality of a trained dnn model a la what mlperf needs...)
+
+# tc_name is used as the output program name for the final C++ build
+tc_name = 'sort'
+
+# Input data file
+# data_in must contain a newline-separated list of values of data_in_type
+# data_in must have no extraneous lines or information of any sort in the file
+# data_in_type must be one of [int32_t, int64_t, double]
+data_in = 'sort-input.data'
+data_in_type = 'int32_t'
+
+# Output data file
+# data_out must contain a newline-separated list of values of data_out_type
+# data_out must have no extraneous lines or information of any sort in the file
+# data_out_type must be one of [int32_t, int64_t, double]
+data_out = 'sort-check.data'
+data_out_type = 'int32_t'
 
 
 
@@ -17,12 +27,17 @@ data_out_type = 'int32_t' # Modify this per the specific testcase; must be one o
 
 ################ DO NOT MODIFY ANYTHING BELOW THIS LINE!!! ################
 
+
+
 import argparse
 import sys
 import subprocess
 import os
 
-# Parse command-line args
+
+
+######## Parse command-line args ########
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-v', dest='verbose', action='store_const', const=True, default=False)
 parser.add_argument('-s', dest='syscfg')
@@ -34,14 +49,11 @@ if not (args.syscfg):
 	sys.exit(1)
 else: print 'Syscfg: ' + args.syscfg
 
-# Parse system definition file
-# Each line must have, in this order, separated by spaces:
-#  (1) A unique integer identifier >= 0 for the module in question. Negative values are reserved for the system and must not be used.
-#  (2) The case-sensitive name of the module class. This must correspond EXACTLY to the name of the module's top-level .cpp and .hpp files (both are required - the .hpp to include in the system configuration .cpp file we programmatically generate, and the .cpp to include for the actual compilation).
-#  (3) A space-separated list, in order, of all parameters (besides module ID) required by the module constructor. These will be passed directly, as-is, to the constructor, and thus must be syntactically correct in C++.
-#  (4) (Optional) The keyword "init", which must exist at least once in the module list. In addition to its process() function, this module must include an init() function following the protoype given in prototypes.hpp, which is called to initially ingest and parse the testcase's input data into appropriate user-defined module-internal data structures (e.g., setting up the initial contents of DRAM before simulation begins). (FIXME: This function may not be required for some testcases, e.g. those assuming an input stream of data arriving at periodic intervals.)
-#  (5) (Optional) the keyword "start", which, like "init", must exist at least once in the module list. The testharness will send a Start message to this/these module(s) at the beginning of simulation. (FIXME: is it actually *always* needed in *some* module, or could it just not exist at all and do fine? (answer: probably [the latter]))
-# Any module may send a message to the system (destination node id = -1, ThReqType = Done) indicating that computation is complete, containing a properly structured (per the testcase definition) bundle of data to compare against the reference output.
+######## End: parse command-line args ########
+
+
+
+######## Parse system definition file ########
 
 sources_cpp = []
 includes = ''
@@ -53,7 +65,7 @@ with open(args.syscfg, 'r') as f:
 		params = []
 		init = False
 		start = False
-		for i in range(2,len(tokens)):
+		for i in range(2,len(tokens)): #TODO FIXME make this better-defined, and less potentially-confusing in structure, and also make sure to note in the docs that "init" and "start" cannot appear in the C++ params!
 			if tokens[i] == 'init': init = True
 			elif tokens[i] == 'start': start = True
 			else: params.append(tokens[i])
@@ -66,7 +78,12 @@ with open(args.syscfg, 'r') as f:
 		if start: gens += '\tmod_start_ids.push_back('+tokens[0]+');\n'
 		sources_cpp.append(tokens[1]+'.cpp')
 
-# Generate _system.cpp
+######## End: parse system definition file ########
+
+
+
+######## Generate _system.cpp ########
+
 systemcpp_str = ''
 systemcpp_str += '''/******** DYNAMICALLY GENERATED FILE, DO NOT MODIFY ********/
 #include <stdlib.h>
@@ -107,11 +124,21 @@ int SysCfg::cleanList() {
 }
 /***********************************************************/'''
 
-# Write _system.cpp
+######## End: generate _system.cpp ########
+
+
+
+######## Write _system.cpp ########
+
 with open('_system.cpp', 'w') as f:
 	f.write(systemcpp_str)
 
-# Generate _system.hpp
+######## End: write _system.cpp ########
+
+
+
+######## Generate _system.hpp ########
+
 systemhpp_str = ''
 systemhpp_str += '''/******** DYNAMICALLY GENERATED FILE, DO NOT MODIFY ********/
 #include <stdlib.h>
@@ -146,11 +173,21 @@ class SysCfg {
 #endif
 /***********************************************************/'''
 
-# Write _system.hpp
+######## End: generate _system.hpp ########
+
+
+
+######## Write _system.hpp ########
+
 with open('_system.hpp', 'w') as f:
 	f.write(systemhpp_str)
 
-# Build system
+######## End: write _system.hpp ########
+
+
+
+######## Build system ########
+
 buildstr = 'g++ prototypes.cpp '
 for s in sources_cpp:
 	buildstr += s+' '
@@ -159,8 +196,15 @@ if os.path.exists(tc_name): os.system('rm '+tc_name)
 print 'Calling build: '+buildstr
 os.system(buildstr)
 
-# Run it!
+######## End: build system ########
+
+
+
+######## Run it! ########
+
 runstr = './'+tc_name+' -i '+data_in+' -o '+data_out
 if args.verbose: runstr += ' -v'
 print 'Calling run: '+runstr
 os.system(runstr)
+
+######## End: run it! ########

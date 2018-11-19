@@ -55,14 +55,6 @@ else: print 'Syscfg: ' + args.syscfg
 
 ######## Parse system definition file ########
 
-# Each line must have, in this order, separated by spaces:
-#  (1) A unique integer identifier >= 0 for the module in question. Negative values are reserved for the system and must not be used.
-#  (2) The case-sensitive name of the module class. This must correspond EXACTLY to the name of the module's top-level .cpp and .hpp files (both are required - the .hpp to include in the system configuration .cpp file we programmatically generate, and the .cpp to include for the actual compilation).
-#  (3) A space-separated list, in order, of all parameters (besides module ID) required by the module constructor. These will be passed directly, as-is, to the constructor, and thus must be syntactically correct in C++.
-#  (4) (Optional) The keyword "init", which must exist at least once in the module list. In addition to its process() function, this module must include an init() function following the protoype given in prototypes.hpp, which is called to initially ingest and parse the testcase's input data into appropriate user-defined module-internal data structures (e.g., setting up the initial contents of DRAM before simulation begins). Note that, programmatically, all Module()'s must implement this function, even if the function is empty (i.e., "{}"), to prevent the compiler complaining about pure virtual functions.
-#  (5) (Optional) the keyword "start", which, like "init", must exist at least once in the module list. The testharness will send a Start message to this/these module(s) at the beginning of simulation.
-# Any module may send a message to the system (destination node id = -1, ThReqType = Done) indicating that computation is complete, containing a properly structured (per the testcase definition) bundle of data to compare against the reference output.
-
 sources_cpp = []
 includes = ''
 gens = ''

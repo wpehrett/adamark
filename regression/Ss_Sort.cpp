@@ -117,7 +117,7 @@ void ss_sort(int a[SIZE], int b[SIZE], int bucket[BUCKETSIZE], int sum[SCAN_RADI
     // If trip count is even, buffer A will be valid at the end.
 }
 
-//Ss_Sort constructor/destructor
+//Constructor/destructor
 Ss_Sort::Ss_Sort(unsigned int id) {
 	//((Module*)this)->id = id;
 	this->id = id;
@@ -140,7 +140,6 @@ void Ss_Sort::init(void* data, unsigned int size) {
 void Ss_Sort::process_real(Message* m) {
 	ThReqParams* r = (ThReqParams*)(m->data);
 	unsigned int sender = m->src;
-	//printf("Calling procreal...\n");
 	
 	if (r->type == Start) { //Start processing data currently in storage
 		ss_sort(this->a, this->b, this->bucket, this->sum);

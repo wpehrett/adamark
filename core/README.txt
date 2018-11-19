@@ -14,9 +14,11 @@ To run a testcase, use the command "python <test_name>.py" using the following c
 -s <system_name>.syscfg (required) - provide system definition
 -v: verbose mode (optional) - increase text output for debugging etc.
 
-----------------
+----------------------------------------------------------------
 
 Now for the gory details:
+
+--------DEFINING A SYSTEM--------
 
 The Python test script parses the system config file, then compiles and runs a simulator binary for that particular system design. Within the system definition (.syscfg) file, each line must have, in this order, separated by spaces:
 
@@ -34,7 +36,19 @@ On each simulation cycle, each Module's process() function is called. In general
 
 This message-passing structure inherently approximates a simplistic, fully-connected system in which input/output queue sizes are infinite, messages are transmitted in one cycle and may be of any arbitrary size, etc. More complex, i.e. more realistic, interconnects may be built by wrapping modules in other modules - for instance, by wrapping a NoC interface with proper flow control and limited packet/flit sizes around an accelerator kernel. (Future work intends to permit straightforward interfacing with BookSim, Garnet, etc. as desired.)
 
-The Message class is designed to be as generic as possible in order to permit maximum flexibility to system designers in how they implement inter-module communication. In general, good practice is to set the data field of a Message object to an instance of a well-defined C++ class. The ThReqParams class, for instance (see prototypes.hpp), is designed to enable communication between Modules and the simulator/testharness. This class is used for passing start messages to modules; additionally, any module may send a message to the system (destination node id = -1, ThReqType = Done) indicating that computation is complete and simulation should end. This message must contain a properly structured (per the testcase definition) bundle of data to be compared against the reference output.
+
+--------CLASS PROTOTYPES--------
+
+Message:
+The Message class is designed to be as generic as possible in order to permit maximum flexibility to system designers in how they implement inter-module communication. In general, good practice is to set the data field of a Message object to an instance of a well-defined C++ class. The ThReqParams class, for instance (see prototypes.hpp), is designed to enable communication between Modules and the simulator/testharness. This class is used for passing start messages to modules; additionally, any module may send a message to the system (destination node id = -1, ThReqType = Done) indicating that computation is complete and simulation should end. This message must contain a properly structured (per the testcase definition) bundle of data to be compared against the reference output. Specifically, the data must be an array of values of type and quantity defined by the testcase. The testharness will compare these against the reference output immediately upon receipt.
+
+Module:
+The Module class, like the Message class, is designed to be as generic as possible to provide a foundation for both arbitrary hardware definitions and more-specific class prototypes for common purposes (see below). The key elements, as noted previously, are the module ID (used for passing messages), the input and output queues of Messages, the init() function (used to initialize internal data structures with testcase-specific input data from the testbench, if necessary), and the process() function (called at each simulation step for each module).
+
+FixedLatencyModule:
+<Coming soon!>
+
+--------FINAL NOTES--------
 
 Things that should never ever ever be modified unless you really absolutely positively know what you're doing:
 - main.cpp
